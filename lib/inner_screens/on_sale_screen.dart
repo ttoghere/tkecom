@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/models/products_model.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -7,9 +10,10 @@ class OnSaleScreen extends StatelessWidget {
   const OnSaleScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    bool _isEmpty = false;
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
+    ProductsProvider productProviders = context.read<ProductsProvider>();
+    List<ProductModel> onSaleProducts = productProviders.getOnSaleProducts;
     return Scaffold(
       appBar: AppBar(
         leading: const BackWidget(),
@@ -22,7 +26,7 @@ class OnSaleScreen extends StatelessWidget {
           isTitle: true,
         ),
       ),
-      body: _isEmpty
+      body: onSaleProducts.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -51,8 +55,9 @@ class OnSaleScreen extends StatelessWidget {
               padding: EdgeInsets.zero,
               // crossAxisSpacing: 10,
               childAspectRatio: size.width / (size.height * 0.50),
-              children: List.generate(16, (index) {
-                return const OnSaleWidget();
+              children: List.generate(onSaleProducts.length, (index) {
+                return ChangeNotifierProvider.value(
+                    value: onSaleProducts[index], child: const OnSaleWidget());
               }),
             ),
     );

@@ -1,8 +1,11 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
 import 'package:tkecom/consts/consts_shelf.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
+import 'package:tkecom/models/products_model.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -21,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // final themeState = utils.getTheme;
     final Color color = Utils(context).color;
     Size size = utils.getScreenSize;
+    ProductsProvider productProviders = context.read<ProductsProvider>();
+    List<ProductModel> allProducts = productProviders.getProducts;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -91,10 +96,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: SizedBox(
                     height: size.height * 0.26,
                     child: ListView.builder(
-                        itemCount: 10,
+                        itemCount: productProviders.getOnSaleProducts.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (ctx, index) {
-                          return const OnSaleWidget();
+                          return ChangeNotifierProvider.value(
+                              value: productProviders.getOnSaleProducts[index],
+                              child: const OnSaleWidget());
                         }),
                   ),
                 ),
@@ -136,11 +143,15 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: 2,
               padding: EdgeInsets.zero,
               // crossAxisSpacing: 10,
-              childAspectRatio: size.width / (size.height * 0.68),
-              children: List.generate(4, (index) {
-                return const FeedsWidget();
-              }),
-            )
+              childAspectRatio: size.width / (size.height * 0.59),
+              children: List.generate(
+                allProducts.length,
+                (index) => ChangeNotifierProvider.value(
+                  value: allProducts[index],
+                  child: FeedsWidget(),
+                ),
+              ),
+            ),
           ],
         ),
       ),

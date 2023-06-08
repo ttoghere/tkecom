@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/models/products_model.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
 import '../services/utils.dart';
-
 
 class FeedsScreen extends StatefulWidget {
   static const routeName = "/FeedsScreenState";
@@ -26,6 +28,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
+    ProductsProvider productProviders = context.read<ProductsProvider>();
+    List<ProductModel> allProducts = productProviders.getProducts;
     return Scaffold(
       appBar: AppBar(
         leading: const BackWidget(),
@@ -79,16 +83,18 @@ class _FeedsScreenState extends State<FeedsScreen> {
             ),
           ),
           GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            padding: EdgeInsets.zero,
-            // crossAxisSpacing: 10,
-            childAspectRatio: size.width / (size.height * 0.59),
-            children: List.generate(10, (index) {
-              return const FeedsWidget();
-            }),
-          ),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              padding: EdgeInsets.zero,
+              // crossAxisSpacing: 10,
+              childAspectRatio: size.width / (size.height * 0.59),
+              children: List.generate(
+                  allProducts.length,
+                  (index) => ChangeNotifierProvider.value(
+                        value: allProducts[index],
+                        child: FeedsWidget(),
+                      ))),
         ]),
       ),
     );

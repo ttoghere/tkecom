@@ -4,6 +4,8 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -30,6 +32,13 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     Size size = Utils(context).getScreenSize;
     final Color color = Utils(context).color;
+    final productId = ModalRoute.of(context)!.settings.arguments as String;
+    final productProvider = context.read<ProductsProvider>();
+    final productDetails = productProvider.findProdById(productId: productId);
+    double userPrice = productDetails.isOnSale
+        ? productDetails.salePrice
+        : productDetails.price;
+    double total = userPrice * int.parse(_quantityTextController.text);
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +58,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         Flexible(
           flex: 2,
           child: FancyShimmerImage(
-            imageUrl: 'https://i.ibb.co/F0s3FHQ/Apricots.png',
+            imageUrl: productDetails.imageUrl,
             boxFit: BoxFit.scaleDown,
             width: size.width,
             // height: screenHeight * .4,
@@ -75,7 +84,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     children: [
                       Flexible(
                         child: TextWidget(
-                          text: 'title',
+                          text: productDetails.title,
                           color: color,
                           textSize: 25,
                           isTitle: true,
@@ -92,13 +101,13 @@ class _ProductDetailsState extends State<ProductDetails> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       TextWidget(
-                        text: '\$2.59',
+                        text: '\$${productDetails.salePrice}',
                         color: Colors.green,
                         textSize: 22,
                         isTitle: true,
                       ),
                       TextWidget(
-                        text: '/Kg',
+                        text: productDetails.isPiece ? "Piece" : '/Kg',
                         color: color,
                         textSize: 12,
                         isTitle: false,
@@ -109,7 +118,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       Visibility(
                         visible: true,
                         child: Text(
-                          '\$3.9',
+                          '\$${productDetails.price}',
                           style: TextStyle(
                               fontSize: 15,
                               color: color,
@@ -230,7 +239,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               child: Row(
                                 children: [
                                   TextWidget(
-                                    text: '\$2.59/',
+                                    text: '\$$total/',
                                     color: color,
                                     textSize: 20,
                                     isTitle: true,

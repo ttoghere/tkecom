@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tkecom/consts/consts_shelf.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/provider/dark_theme_provider.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
 
@@ -37,18 +38,21 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) {
           return themeChangeProvider;
-        })
+        }),
+        ChangeNotifierProvider(create: (_) {
+          return ProductsProvider();
+        }),
       ],
       child:
           Consumer<DarkThemeProvider>(builder: (context, themeProvider, child) {
         return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'Flutter Demo',
+            title: 'TKEcom',
             theme: Styles.themeData(themeProvider.getDarkTheme, context),
             home: const LoginScreen(),
             routes: {
               OnSaleScreen.routeName: (ctx) => const OnSaleScreen(),
-              BottomBarScreen.routeName:(context) => const BottomBarScreen(),
+              BottomBarScreen.routeName: (context) => const BottomBarScreen(),
               FeedsScreen.routeName: (ctx) => const FeedsScreen(),
               ProductDetails.routeName: (ctx) => const ProductDetails(),
               WishlistScreen.routeName: (ctx) => const WishlistScreen(),

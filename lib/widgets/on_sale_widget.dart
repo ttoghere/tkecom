@@ -4,6 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -21,6 +22,7 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
     // final theme = Utils(context).getTheme;
     Size size = Utils(context).getScreenSize;
     final ProductModel productModel = context.read<ProductModel>();
+    final CartProvider cartProvider = context.read<CartProvider>();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -67,7 +69,12 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                           Row(
                             children: [
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  cartProvider.addProductsToCart(
+                                    productId: productModel.id,
+                                    quantity: 1,
+                                  );
+                                },
                                 child: Icon(
                                   IconlyLight.bag2,
                                   size: 22,

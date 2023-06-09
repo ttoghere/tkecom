@@ -27,28 +27,9 @@ class OnSaleScreen extends StatelessWidget {
         ),
       ),
       body: onSaleProducts.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Image.asset(
-                        'assets/images/box.png',
-                      ),
-                    ),
-                    Text(
-                      'No products on sale yet!,\nStay tuned',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: color,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ),
+          ? EmptyProductsListWidget(
+              color: color,
+              text: 'No products on sale yet!,\nStay tuned',
             )
           : GridView.count(
               crossAxisCount: 2,
@@ -60,6 +41,42 @@ class OnSaleScreen extends StatelessWidget {
                     value: onSaleProducts[index], child: const OnSaleWidget());
               }),
             ),
+    );
+  }
+}
+
+class EmptyProductsListWidget extends StatelessWidget {
+  const EmptyProductsListWidget({
+    super.key,
+    required this.color,
+    required this.text,
+  });
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Image.asset(
+                'assets/images/box.png',
+              ),
+            ),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: color, fontSize: 30, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -298,4 +298,13 @@ class ProductsProvider with ChangeNotifier {
   ProductModel findProdById({required String productId}) {
     return _productsList.firstWhere((element) => element.id == productId);
   }
+
+  List<ProductModel> findByCategory({required String categoryName}) {
+    List<ProductModel> _categoryList = _productsList
+        .where((element) => element.productCategoryName
+            .toLowerCase()
+            .contains(categoryName.toLowerCase()))
+        .toList();
+    return _categoryList;
+  }
 }

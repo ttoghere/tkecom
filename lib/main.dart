@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tkecom/consts/consts_shelf.dart';
+import 'package:tkecom/inner_screens/cat_screen.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/dark_theme_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
@@ -42,6 +44,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) {
           return ProductsProvider();
         }),
+        ChangeNotifierProvider(create: (_) {
+          return CartProvider();
+        })
       ],
       child:
           Consumer<DarkThemeProvider>(builder: (context, themeProvider, child) {
@@ -64,6 +69,7 @@ class _MyAppState extends State<MyApp> {
               LoginScreen.routeName: (ctx) => const LoginScreen(),
               ForgetPasswordScreen.routeName: (ctx) =>
                   const ForgetPasswordScreen(),
+              CategoryScreen.routeName: (context) => const CategoryScreen()
             });
       }),
     );

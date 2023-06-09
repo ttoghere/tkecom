@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
@@ -34,6 +35,7 @@ class _FeedsWidgetState extends State<FeedsWidget> {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
     final ProductModel productModel = context.read<ProductModel>();
+    final cartProvider = context.read<CartProvider>();
     return Material(
       borderRadius: BorderRadius.circular(12),
       color: Theme.of(context).cardColor,
@@ -138,19 +140,25 @@ class _FeedsWidgetState extends State<FeedsWidget> {
           SizedBox(
             width: double.infinity,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                cartProvider.addProductsToCart(
+                  productId: productModel.id,
+                  quantity: int.parse(_quantityTextController.text),
+                );
+              },
               style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Theme.of(context).cardColor),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(12.0),
-                        bottomRight: Radius.circular(12.0),
-                      ),
+                backgroundColor:
+                    MaterialStateProperty.all(Theme.of(context).cardColor),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(12.0),
+                      bottomRight: Radius.circular(12.0),
                     ),
-                  )),
+                  ),
+                ),
+              ),
               child: TextWidget(
                 text: 'Add to cart',
                 maxLines: 1,

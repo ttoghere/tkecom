@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 import 'cart_shelf.dart';
-
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -11,9 +12,10 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
-    Size size = Utils(context).getScreenSize;
-    bool _isEmpty = true;
-    return _isEmpty
+    final cartProvider = context.watch<CartProvider>();
+    final cartItems =
+        cartProvider.getCartItems.values.toList().reversed.toList();
+    return cartItems.isEmpty
         ? const EmptyScreen(
             title: 'Your cart is empty',
             subtitle: 'Add something and make me happy :)',
@@ -25,7 +27,7 @@ class CartScreen extends StatelessWidget {
                 elevation: 0,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: TextWidget(
-                  text: 'Cart (2)',
+                  text: 'Cart (${cartItems.length})',
                   color: color,
                   isTitle: true,
                   textSize: 22,
@@ -36,7 +38,10 @@ class CartScreen extends StatelessWidget {
                       GlobalMethods.warningDialog(
                           title: 'Empty your cart?',
                           subtitle: 'Are you sure?',
-                          fct: () {},
+                          fct: () {
+                            cartProvider.clearCart();
+                            Navigator.of(context).pop();
+                          },
                           context: context);
                     },
                     icon: Icon(
@@ -50,9 +55,13 @@ class CartScreen extends StatelessWidget {
                 _checkout(ctx: context),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: 10,
+                    itemCount: cartItems.length,
                     itemBuilder: (ctx, index) {
-                      return CartWidget();
+                      return ChangeNotifierProvider.value(
+                          value: cartItems[index],
+                          child: CartWidget(
+                            quantity: cartItems[index].quantity,
+                          ));
                     },
                   ),
                 ),

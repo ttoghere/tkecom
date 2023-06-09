@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/inner_screens/cat_screen.dart';
 import 'package:tkecom/provider/provider_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -23,7 +24,8 @@ class CategoriesWidget extends StatelessWidget {
     final Color color = themeState.getDarkTheme ? Colors.white : Colors.black;
     return InkWell(
       onTap: () {
-        log('Category pressed');
+          Navigator.of(context).pushNamed(CategoryScreen.routeName,
+                arguments: catText);
       },
       child: Container(
         // height: _screenWidth * 0.6,

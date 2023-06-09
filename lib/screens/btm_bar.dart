@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/provider_shelf.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
 import 'package:tkecom/screens/user/user_shelf.dart';
@@ -46,6 +47,8 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
   Widget build(BuildContext context) {
     final themeState = Provider.of<DarkThemeProvider>(context);
     bool _isDark = themeState.getDarkTheme;
+    final cartProvider = context.watch<CartProvider>();
+    final cartItems = cartProvider.getCartItems.values.toList();
     return Scaffold(
       // appBar: AppBar(
       //   title: Text( _pages[_selectedIndex]['title']),
@@ -82,7 +85,9 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                 position: BadgePosition.topEnd(top: -7, end: -7),
                 badgeContent: FittedBox(
                     child: TextWidget(
-                        text: '1', color: Colors.white, textSize: 15)),
+                        text: cartItems.length.toString(),
+                        color: Colors.white,
+                        textSize: 15)),
                 child: Icon(
                     _selectedIndex == 2 ? IconlyBold.buy : IconlyLight.buy)),
             label: "Cart",

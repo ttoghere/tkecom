@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
@@ -12,9 +14,10 @@ class WishlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
-    Size size = Utils(context).getScreenSize;
-    bool _isEmpty = true;
-    return _isEmpty
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    final wishlistItemsList =
+        wishlistProvider.wishlistItems.values.toList().reversed.toList();
+    return wishlistItemsList.isEmpty
         ? const EmptyScreen(
             title: 'Your Wishlist Is Empty',
             subtitle: 'Explore more and shortlist some items',
@@ -29,7 +32,7 @@ class WishlistScreen extends StatelessWidget {
                 elevation: 0,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: TextWidget(
-                  text: 'Wishlist (2)',
+                  text: 'Wishlist (${wishlistItemsList.length})',
                   color: color,
                   isTitle: true,
                   textSize: 22,
@@ -40,7 +43,10 @@ class WishlistScreen extends StatelessWidget {
                       GlobalMethods.warningDialog(
                           title: 'Empty your wishlist?',
                           subtitle: 'Are you sure?',
-                          fct: () {},
+                          fct: () {
+                            wishlistProvider.clearList();
+                            Navigator.of(context).pop();
+                          },
                           context: context);
                     },
                     icon: Icon(
@@ -51,10 +57,11 @@ class WishlistScreen extends StatelessWidget {
                 ]),
             body: MasonryGridView.count(
               crossAxisCount: 2,
-              // mainAxisSpacing: 16,
-              // crossAxisSpacing: 20,
+              itemCount: wishlistItemsList.length,
               itemBuilder: (context, index) {
-                return const WishlistWidget();
+                return ChangeNotifierProvider.value(
+                    value: wishlistItemsList[index],
+                    child: const WishlistWidget());
               },
             ));
   }

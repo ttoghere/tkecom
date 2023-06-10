@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
+import 'package:tkecom/provider/recently_viewed_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -33,19 +36,27 @@ class _ProductDetailsState extends State<ProductDetails> {
     Size size = Utils(context).getScreenSize;
     final Color color = Utils(context).color;
     final productId = ModalRoute.of(context)!.settings.arguments as String;
-    final productProvider = context.read<ProductsProvider>();
+    final productProvider = Provider.of<ProductsProvider>(context);
     final productDetails = productProvider.findProdById(productId: productId);
+    final cartProvider = Provider.of<CartProvider>(context);
+    final recentlyViewedProvider = Provider.of<RecentlyViewedProvider>(context);
     double userPrice = productDetails.isOnSale
         ? productDetails.salePrice
         : productDetails.price;
     double total = userPrice * int.parse(_quantityTextController.text);
+    bool? _isInCart = cartProvider.getCartItems.containsKey(productDetails.id);
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    bool? _isInWishlist =
+        wishlistProvider.wishlistItems.containsKey(productDetails.id);
 
     return Scaffold(
       appBar: AppBar(
           leading: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () =>
-                Navigator.canPop(context) ? Navigator.pop(context) : null,
+            onTap: () {
+              recentlyViewedProvider.addToHistory(productId: productId);
+              Navigator.pop(context);
+            },
             child: Icon(
               IconlyLight.arrowLeft2,
               color: color,
@@ -90,7 +101,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                           isTitle: true,
                         ),
                       ),
-                      const HeartBTN(),
+                      HeartBTN(
+                        productId: productDetails.id,
+                        isInWishlist: _isInWishlist,
+                      ),
                     ],
                   ),
                 ),
@@ -239,7 +253,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               child: Row(
                                 children: [
                                   TextWidget(
-                                    text: '\$$total/',
+                                    text: '\$${total.toStringAsFixed(2)}/',
                                     color: color,
                                     textSize: 20,
                                     isTitle: true,
@@ -264,12 +278,20 @@ class _ProductDetailsState extends State<ProductDetails> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
-                            onTap: () {},
+                            onTap: _isInCart
+                                ? null
+                                : () {
+                                    cartProvider.addProductsToCart(
+                                      productId: productDetails.id,
+                                      quantity: int.parse(
+                                          _quantityTextController.text),
+                                    );
+                                  },
                             borderRadius: BorderRadius.circular(10),
                             child: Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: TextWidget(
-                                    text: 'Add to cart',
+                                    text: _isInCart ? 'In Cart' : 'Add to cart',
                                     color: Colors.white,
                                     textSize: 18)),
                           ),

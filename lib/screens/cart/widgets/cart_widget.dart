@@ -1,8 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tkecom/inner_screens/product_details.dart';
@@ -10,6 +10,7 @@ import 'package:tkecom/models/cart_model.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/widgets/heart_btn.dart';
 import 'package:tkecom/widgets/text_widget.dart';
 
@@ -52,6 +53,9 @@ class _CartWidgetState extends State<CartWidget> {
     double userPrice = getCurrentProduct.isOnSale
         ? getCurrentProduct.salePrice
         : getCurrentProduct.price;
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    bool? _isInWishlist =
+        wishlistProvider.wishlistItems.containsKey(getCurrentProduct.id);
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(ProductDetails.routeName,
@@ -113,7 +117,7 @@ class _CartWidgetState extends State<CartWidget> {
                                   }
                                 },
                                 color: Colors.red,
-                                icon: CupertinoIcons.minus,
+                                icon: IconlyBold.arrowDown,
                               ),
                               Flexible(
                                 flex: 1,
@@ -154,7 +158,7 @@ class _CartWidgetState extends State<CartWidget> {
                                   });
                                 },
                                 color: Colors.green,
-                                icon: CupertinoIcons.plus,
+                                icon: IconlyBold.arrowUp,
                               )
                             ],
                           ),
@@ -179,7 +183,10 @@ class _CartWidgetState extends State<CartWidget> {
                           const SizedBox(
                             height: 5,
                           ),
-                          const HeartBTN(),
+                          HeartBTN(
+                            productId: getCurrentProduct.id,
+                            isInWishlist: _isInWishlist,
+                          ),
                           TextWidget(
                             text: '\$${userPrice.toStringAsFixed(2)}',
                             color: color,

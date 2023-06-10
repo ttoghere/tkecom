@@ -29,7 +29,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
-    ProductsProvider productProviders = context.read<ProductsProvider>();
+    ProductsProvider productProviders = Provider.of<ProductsProvider>(context);
     var categoryName = ModalRoute.of(context)!.settings.arguments as String;
     List<ProductModel> productByCat =
         productProviders.findByCategory(categoryName: categoryName);

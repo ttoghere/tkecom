@@ -3,7 +3,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
+import 'package:tkecom/models/recently_viewed_model.dart';
+import 'package:tkecom/provider/cart_provider.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -19,6 +24,16 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
   Widget build(BuildContext context) {
     Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
+    final productProvider = Provider.of<ProductsProvider>(context);
+    final viewedProdModel = Provider.of<RecentlyViewedModel>(context);
+    final getCurrentProduct =
+        productProvider.findProdById(productId: viewedProdModel.productId);
+    double usedPrice = getCurrentProduct.isOnSale
+        ? getCurrentProduct.salePrice
+        : getCurrentProduct.price;
+    final cartProvider = Provider.of<CartProvider>(context);
+    bool? _isInCart =
+        cartProvider.getCartItems.containsKey(getCurrentProduct.id);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
@@ -31,7 +46,7 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FancyShimmerImage(
-              imageUrl: 'https://i.ibb.co/F0s3FHQ/Apricots.png',
+              imageUrl: getCurrentProduct.imageUrl,
               boxFit: BoxFit.fill,
               height: size.width * 0.27,
               width: size.width * 0.25,
@@ -40,20 +55,23 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
               width: 12,
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextWidget(
-                  text: 'Title',
-                  color: color,
-                  textSize: 24,
-                  isTitle: true,
+                FittedBox(
+                  child: TextWidget(
+                    text: getCurrentProduct.title,
+                    color: color,
+                    textSize: 20,
+                    isTitle: true,
+                  ),
                 ),
                 const SizedBox(
                   height: 12,
                 ),
                 TextWidget(
-                  text: '\$12.88',
+                  text: '\$${usedPrice.toStringAsFixed(2)}',
                   color: color,
-                  textSize: 20,
+                  textSize: 16,
                   isTitle: false,
                 ),
               ],
@@ -66,11 +84,18 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
                 color: Colors.green,
                 child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () {},
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    onTap: _isInCart
+                        ? () {
+                            cartProvider.removeOneItem(getCurrentProduct.id);
+                          }
+                        : () {
+                            cartProvider.addProductsToCart(
+                                productId: getCurrentProduct.id, quantity: 1);
+                          },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Icon(
-                        CupertinoIcons.add,
+                        _isInCart ? Icons.check : IconlyBold.plus,
                         color: Colors.white,
                         size: 20,
                       ),

@@ -8,10 +8,13 @@ import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
 class FeedsWidget extends StatefulWidget {
+  const FeedsWidget({Key? key}) : super(key: key);
+
   @override
   State<FeedsWidget> createState() => _FeedsWidgetState();
 }
@@ -34,83 +37,95 @@ class _FeedsWidgetState extends State<FeedsWidget> {
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
-    final ProductModel productModel = context.read<ProductModel>();
-    final cartProvider = context.read<CartProvider>();
-    return Material(
-      borderRadius: BorderRadius.circular(12),
-      color: Theme.of(context).cardColor,
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context)
-              .pushNamed(ProductDetails.routeName, arguments: productModel.id);
-        },
+    final productModel = Provider.of<ProductModel>(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    bool? _isInCart = cartProvider.getCartItems.containsKey(productModel.id);
+    bool? _isInWishlist =
+        wishlistProvider.wishlistItems.containsKey(productModel.id);
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+          border: Border.all(width: 1, color: color),
+          borderRadius: BorderRadius.circular(10)),
+      child: Material(
         borderRadius: BorderRadius.circular(12),
-        child: Column(children: [
-          FancyShimmerImage(
-            imageUrl: productModel.imageUrl,
-            height: size.width * 0.17,
-            width: size.width * 0.17,
-            boxFit: BoxFit.fill,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: TextWidget(
-                      text: productModel.title,
-                      color: color,
-                      textSize: 15,
-                      isTitle: true,
-                    ),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: HeartBTN(),
-                  ),
-                ],
+        color: Theme.of(context).cardColor,
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, ProductDetails.routeName,
+                arguments: productModel.id);
+            // GlobalMethods.navigateTo(
+            //     ctx: context, routeName: ProductDetails.routeName);
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Column(
+            children: [
+              FancyShimmerImage(
+                imageUrl: productModel.imageUrl,
+                height: size.width * 0.14,
+                width: size.width * 0.14,
+                boxFit: BoxFit.fill,
               ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    flex: 3,
-                    child: PriceWidget(
-                      salePrice: productModel.salePrice,
-                      price: productModel.price,
-                      textPrice: _quantityTextController.text,
-                      isOnSale: productModel.isOnSale,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: FittedBox(
+                        child: TextWidget(
+                          text: productModel.title,
+                          color: color,
+                          maxLines: 1,
+                          textSize: 18,
+                          isTitle: true,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 40,
-                  ),
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Flexible(
-                          flex: 10,
-                          child: FittedBox(
-                            child: TextWidget(
-                              text: productModel.isPiece ? "Piece" : "KG",
-                              color: color,
-                              textSize: 18,
-                              isTitle: true,
+                    Flexible(
+                      flex: 1,
+                      child: HeartBTN(
+                        productId: productModel.id,
+                        isInWishlist: _isInWishlist,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: PriceWidget(
+                        salePrice: productModel.salePrice,
+                        price: productModel.price,
+                        textPrice: _quantityTextController.text,
+                        isOnSale: productModel.isOnSale,
+                      ),
+                    ),
+                    Flexible(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            flex: 6,
+                            child: FittedBox(
+                              child: TextWidget(
+                                text: productModel.isPiece ? 'Piece' : 'kg',
+                                color: color,
+                                textSize: 20,
+                                isTitle: true,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Flexible(
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Flexible(
                             flex: 2,
                             // TextField can be used also instead of the textFormField
                             child: TextFormField(
@@ -128,46 +143,53 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                                   RegExp('[0-9.]'),
                                 ),
                               ],
-                            ))
-                      ],
-                    ),
-                  )
-                ],
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          ),
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () {
-                cartProvider.addProductsToCart(
-                  productId: productModel.id,
-                  quantity: int.parse(_quantityTextController.text),
-                );
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(Theme.of(context).cardColor),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(12.0),
-                      bottomRight: Radius.circular(12.0),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _isInCart
+                      ? null
+                      : () {
+                          // if (_isInCart) {
+                          //   return;
+                          // }
+                          cartProvider.addProductsToCart(
+                              productId: productModel.id,
+                              quantity:
+                                  int.parse(_quantityTextController.text));
+                        },
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Theme.of(context).cardColor),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                        ),
+                      ),
                     ),
+                  ),
+                  child: TextWidget(
+                    text: _isInCart ? 'In cart' : 'Add to cart',
+                    maxLines: 1,
+                    color: color,
+                    textSize: 20,
                   ),
                 ),
               ),
-              child: TextWidget(
-                text: 'Add to cart',
-                maxLines: 1,
-                color: color,
-                textSize: 20,
-              ),
-            ),
-          )
-        ]),
+            ],
+          ),
+        ),
       ),
     );
   }

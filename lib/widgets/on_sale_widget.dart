@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -21,11 +22,18 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
     final Color color = Utils(context).color;
     // final theme = Utils(context).getTheme;
     Size size = Utils(context).getScreenSize;
-    final ProductModel productModel = context.read<ProductModel>();
-    final CartProvider cartProvider = context.read<CartProvider>();
+    final ProductModel productModel = Provider.of<ProductModel>(context);
+    final CartProvider cartProvider = Provider.of<CartProvider>(context);
+    bool? _isInCart = cartProvider.getCartItems.containsKey(productModel.id);
+        final wishlistProvider = Provider.of<WishlistProvider>(context);
+        bool? _isInWishlist =
+        wishlistProvider.wishlistItems.containsKey(productModel.id);
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+          border: Border.all(width: 1, color: color),
+          borderRadius: BorderRadius.circular(10)),
       child: Material(
         color: Theme.of(context).cardColor.withOpacity(0.9),
         borderRadius: BorderRadius.circular(12),
@@ -76,12 +84,17 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                                   );
                                 },
                                 child: Icon(
-                                  IconlyLight.bag2,
+                                  _isInCart
+                                      ? IconlyBold.bag2
+                                      : IconlyLight.bag2,
                                   size: 22,
-                                  color: color,
+                                  color: _isInCart ? Colors.green : color,
                                 ),
                               ),
-                              const HeartBTN(),
+                               HeartBTN(
+                        productId: productModel.id,
+                        isInWishlist: _isInWishlist,
+                      ),
                             ],
                           ),
                         ],

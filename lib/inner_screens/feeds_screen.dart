@@ -28,7 +28,7 @@ class _FeedsScreenState extends State<FeedsScreen> {
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
-    ProductsProvider productProviders = context.read<ProductsProvider>();
+    ProductsProvider productProviders = Provider.of<ProductsProvider>(context);
     List<ProductModel> allProducts = productProviders.getProducts;
     return Scaffold(
       appBar: AppBar(

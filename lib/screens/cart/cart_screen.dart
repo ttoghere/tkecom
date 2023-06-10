@@ -12,7 +12,7 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
-    final cartProvider = context.watch<CartProvider>();
+    final cartProvider = Provider.of<CartProvider>(context);
     final cartItems =
         cartProvider.getCartItems.values.toList().reversed.toList();
     return cartItems.isEmpty

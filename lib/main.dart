@@ -6,6 +6,8 @@ import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/dark_theme_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
+import 'package:tkecom/provider/recently_viewed_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
 
@@ -46,6 +48,12 @@ class _MyAppState extends State<MyApp> {
         }),
         ChangeNotifierProvider(create: (_) {
           return CartProvider();
+        }),
+        ChangeNotifierProvider(create: (_) {
+          return WishlistProvider();
+        }),
+        ChangeNotifierProvider(create: (_) {
+          return RecentlyViewedProvider();
         })
       ],
       child:

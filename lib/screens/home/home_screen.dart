@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // final themeState = utils.getTheme;
     final Color color = Utils(context).color;
     Size size = utils.getScreenSize;
-    ProductsProvider productProviders = context.read<ProductsProvider>();
+    ProductsProvider productProviders =Provider.of<ProductsProvider>(context);
     List<ProductModel> allProducts = productProviders.getProducts;
 
     return Scaffold(
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TextWidget(
                 text: 'View all',
                 maxLines: 1,
-                color: Colors.blue,
+                color: color.withRed(50),
                 textSize: 20,
               ),
             ),
@@ -69,28 +69,34 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Row(
               children: [
-                RotatedBox(
-                  quarterTurns: -1,
-                  child: Row(
-                    children: [
-                      TextWidget(
-                        text: 'On sale'.toUpperCase(),
-                        color: Colors.red,
-                        textSize: 22,
-                        isTitle: true,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Icon(
-                        IconlyLight.discount,
-                        color: Colors.red,
-                      ),
-                    ],
+                Container(
+                  padding: const EdgeInsets.all(14.0),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: color, width: 1),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: RotatedBox(
+                    quarterTurns: -1,
+                    child: Row(
+                      children: [
+                        TextWidget(
+                          text: 'On sale'.toUpperCase(),
+                          color: Colors.red,
+                          textSize: 22,
+                          isTitle: true,
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        const Icon(
+                          IconlyLight.discount,
+                          color: Colors.red,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  width: 8,
+                  width: 3,
                 ),
                 Flexible(
                   child: SizedBox(
@@ -130,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: TextWidget(
                       text: 'Browse all',
                       maxLines: 1,
-                      color: Colors.blue,
+                      color: color.withRed(50),
                       textSize: 20,
                     ),
                   ),

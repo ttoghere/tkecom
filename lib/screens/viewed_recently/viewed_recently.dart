@@ -2,6 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
+import 'package:tkecom/models/recently_viewed_model.dart';
+import 'package:tkecom/provider/products_provider.dart';
+import 'package:tkecom/provider/recently_viewed_provider.dart';
+import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/screens/viewed_recently/widgets/widgets_shelf.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
@@ -19,11 +24,15 @@ class _ViewedRecentlyScreenState extends State<ViewedRecentlyScreen> {
   bool check = true;
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductsProvider>(context);
     Color color = Utils(context).color;
-    bool _isEmpty = true;
-    // Size size = Utils(context).getScreenSize;
+    final recentlyViewedProvider = Provider.of<RecentlyViewedProvider>(context);
+    final recentlyViewedList = recentlyViewedProvider.viewedProductsList.values
+        .toList()
+        .reversed
+        .toList();
 
-    if (_isEmpty == true) {
+    if (recentlyViewedList.isEmpty) {
       return const EmptyScreen(
         title: 'Your history is empty',
         subtitle: 'No products has been viewed yet!',
@@ -39,7 +48,10 @@ class _ViewedRecentlyScreenState extends State<ViewedRecentlyScreen> {
                 GlobalMethods.warningDialog(
                     title: 'Empty your history?',
                     subtitle: 'Are you sure?',
-                    fct: () {},
+                    fct: () {
+                      recentlyViewedProvider.clearHistory();
+                      Navigator.of(context).pop();
+                    },
                     context: context);
               },
               icon: Icon(
@@ -61,11 +73,13 @@ class _ViewedRecentlyScreenState extends State<ViewedRecentlyScreen> {
               Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
         ),
         body: ListView.builder(
-            itemCount: 10,
+            itemCount: recentlyViewedList.length,
             itemBuilder: (ctx, index) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-                child: ViewedRecentlyWidget(),
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+                child: ChangeNotifierProvider.value(
+                    value: recentlyViewedList[index],
+                    child: const ViewedRecentlyWidget()),
               );
             }),
       );

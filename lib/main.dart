@@ -10,8 +10,14 @@ import 'package:tkecom/provider/recently_viewed_provider.dart';
 import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+   await Firebase.initializeApp(
+   options: DefaultFirebaseOptions.currentPlatform,
+ );
   runApp(const MyApp());
 }
 

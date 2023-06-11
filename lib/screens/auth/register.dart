@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:tkecom/screens/auth/login.dart';
-
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import '../../consts/contss.dart';
 import '../../services/global_methods.dart';
 import '../../services/utils.dart';
@@ -30,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   final _addressFocusNode = FocusNode();
+  bool _isLoading = false;
   bool _obscureText = true;
   @override
   void dispose() {
@@ -46,15 +47,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _submitFormOnRegister() async {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
+    setState(() {
+      _isLoading = true;
+    });
     if (isValid) {
       _formKey.currentState!.save();
+      try {
+        await auth.FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: _emailTextController.text.toLowerCase().trim(),
+              password: _passTextController.text.trim(),
+            )
+            .whenComplete(
+              () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Action is done"),
+                ),
+              ),
+            );
+      } on auth.FirebaseAuthException catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$e"),
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Utils(context).getTheme;
-    Color color = Utils(context).color;
 
     return Scaffold(
       body: Stack(
@@ -286,12 +316,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                AuthButton(
-                  buttonText: 'Sign up',
-                  fct: () {
-                    _submitFormOnRegister();
-                  },
-                ),
+                _isLoading
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : AuthButton(
+                        buttonText: 'Sign up',
+                        fct: () {
+                          _submitFormOnRegister();
+                        },
+                      ),
                 const SizedBox(
                   height: 10,
                 ),

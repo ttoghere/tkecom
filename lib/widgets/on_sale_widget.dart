@@ -1,7 +1,9 @@
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/consts/firebase_contants.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
@@ -24,9 +26,9 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
     Size size = Utils(context).getScreenSize;
     final ProductModel productModel = Provider.of<ProductModel>(context);
     final CartProvider cartProvider = Provider.of<CartProvider>(context);
-    bool? _isInCart = cartProvider.getCartItems.containsKey(productModel.id);
-        final wishlistProvider = Provider.of<WishlistProvider>(context);
-        bool? _isInWishlist =
+    bool? isInCart = cartProvider.getCartItems.containsKey(productModel.id);
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    bool? isInWishlist =
         wishlistProvider.wishlistItems.containsKey(productModel.id);
 
     return Container(
@@ -78,23 +80,33 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                             children: [
                               GestureDetector(
                                 onTap: () {
+                                  final User? user = authInstance.currentUser;
+                                  if (user == null) {
+                                    GlobalMethods.warningDialog(
+                                        title: "User is not availible",
+                                        subtitle:
+                                            "Please login to your account",
+                                        fct: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        context: context);
+                                    return;
+                                  }
                                   cartProvider.addProductsToCart(
                                     productId: productModel.id,
                                     quantity: 1,
                                   );
                                 },
                                 child: Icon(
-                                  _isInCart
-                                      ? IconlyBold.bag2
-                                      : IconlyLight.bag2,
+                                  isInCart ? IconlyBold.bag2 : IconlyLight.bag2,
                                   size: 22,
-                                  color: _isInCart ? Colors.green : color,
+                                  color: isInCart ? Colors.green : color,
                                 ),
                               ),
-                               HeartBTN(
-                        productId: productModel.id,
-                        isInWishlist: _isInWishlist,
-                      ),
+                              HeartBTN(
+                                productId: productModel.id,
+                                isInWishlist: isInWishlist,
+                              ),
                             ],
                           ),
                         ],

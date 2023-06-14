@@ -1,10 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/consts/firebase_contants.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/provider/recently_viewed_provider.dart';
@@ -44,9 +46,9 @@ class _ProductDetailsState extends State<ProductDetails> {
         ? productDetails.salePrice
         : productDetails.price;
     double total = userPrice * int.parse(_quantityTextController.text);
-    bool? _isInCart = cartProvider.getCartItems.containsKey(productDetails.id);
+    bool? isInCart = cartProvider.getCartItems.containsKey(productDetails.id);
     final wishlistProvider = Provider.of<WishlistProvider>(context);
-    bool? _isInWishlist =
+    bool? isInWishlist =
         wishlistProvider.wishlistItems.containsKey(productDetails.id);
 
     return Scaffold(
@@ -103,7 +105,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                       HeartBTN(
                         productId: productDetails.id,
-                        isInWishlist: _isInWishlist,
+                        isInWishlist: isInWishlist,
                       ),
                     ],
                   ),
@@ -278,9 +280,21 @@ class _ProductDetailsState extends State<ProductDetails> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
-                            onTap: _isInCart
+                            onTap: isInCart
                                 ? null
                                 : () {
+                                    final User? user = authInstance.currentUser;
+                                    if (user == null) {
+                                      GlobalMethods.warningDialog(
+                                          title: "User is not availible",
+                                          subtitle:
+                                              "Please login to your account",
+                                          fct: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          context: context);
+                                      return;
+                                    }
                                     cartProvider.addProductsToCart(
                                       productId: productDetails.id,
                                       quantity: int.parse(
@@ -291,7 +305,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             child: Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: TextWidget(
-                                    text: _isInCart ? 'In Cart' : 'Add to cart',
+                                    text: isInCart ? 'In Cart' : 'Add to cart',
                                     color: Colors.white,
                                     textSize: 18)),
                           ),

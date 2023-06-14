@@ -1,10 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/consts/firebase_contants.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/recently_viewed_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
@@ -38,8 +40,8 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
-          GlobalMethods.navigateTo(
-              ctx: context, routeName: ProductDetails.routeName);
+          Navigator.of(context).pushNamed(ProductDetails.routeName,
+              arguments: getCurrentProduct.id);
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,10 +87,19 @@ class _ViewedRecentlyWidgetState extends State<ViewedRecentlyWidget> {
                 child: InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: _isInCart
-                        ? () {
-                            cartProvider.removeOneItem(getCurrentProduct.id);
-                          }
+                        ? null
                         : () {
+                            final User? user = authInstance.currentUser;
+                            if (user == null) {
+                              GlobalMethods.warningDialog(
+                                  title: "User is not availible",
+                                  subtitle: "Please login to your account",
+                                  fct: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  context: context);
+                              return;
+                            }
                             cartProvider.addProductsToCart(
                                 productId: getCurrentProduct.id, quantity: 1);
                           },

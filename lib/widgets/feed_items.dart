@@ -1,8 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/consts/firebase_contants.dart';
 
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
@@ -55,8 +57,6 @@ class _FeedsWidgetState extends State<FeedsWidget> {
           onTap: () {
             Navigator.pushNamed(context, ProductDetails.routeName,
                 arguments: productModel.id);
-            // GlobalMethods.navigateTo(
-            //     ctx: context, routeName: ProductDetails.routeName);
           },
           borderRadius: BorderRadius.circular(12),
           child: Column(
@@ -136,7 +136,16 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                               maxLines: 1,
                               enabled: true,
                               onChanged: (valueee) {
+                                if (valueee == "") {
+                                  return;
+                                }
                                 setState(() {});
+                              },
+                              validator: (value) {
+                                if (value == "") {
+                                  return;
+                                }
+                                return null;
                               },
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
@@ -158,9 +167,6 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                   onPressed: _isInCart
                       ? null
                       : () {
-                          // if (_isInCart) {
-                          //   return;
-                          // }
                           cartProvider.addProductsToCart(
                               productId: productModel.id,
                               quantity:

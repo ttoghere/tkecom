@@ -2,8 +2,10 @@
 
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:tkecom/screens/auth/auth_shelf.dart';
 import 'package:tkecom/services/utils.dart';
 import 'package:tkecom/widgets/back_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import '../../consts/contss.dart';
 import '../../widgets/auth_button.dart';
@@ -19,6 +21,8 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final _emailTextController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   // bool _isLoading = false;
   @override
   void dispose() {
@@ -27,7 +31,41 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     super.dispose();
   }
 
-  void _forgetPassFCT() async {}
+  bool _isLoading = false;
+  void _forgerPassFCT() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return null;
+    }
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _isLoading = true;
+    });
+    if (isValid) {
+      _formKey.currentState!.save();
+      try {
+        await auth.FirebaseAuth.instance
+            .sendPasswordResetEmail(
+              email: _emailTextController.text.toLowerCase().trim(),
+            )
+            .whenComplete(() => Navigator.of(context)
+                .pushReplacementNamed(LoginScreen.routeName));
+      } on auth.FirebaseAuthException catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$e"),
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,21 +111,34 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 const SizedBox(
                   height: 30,
                 ),
-                
-                TextField(
-                  controller: _emailTextController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Email address',
-                    hintStyle: TextStyle(color: Colors.white),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    errorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
+                Form(
+                  key: _formKey,
+                  child: TextFormField(
+                    controller: _emailTextController,
+                    style: const TextStyle(color: Colors.white),
+                    validator: (value) {
+                      if (value == "" || value!.isEmpty) {
+                        return "Please Enter Your Email";
+                      }
+                      showDialog(
+                          context: context,
+                          builder: (context) => const AlertDialog(
+                                content: Text(
+                                    "Your Password Reset Link,\nHas been sent to your email!"),
+                              ));
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Email address',
+                      hintStyle: TextStyle(color: Colors.white),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      errorBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
                     ),
                   ),
                 ),
@@ -97,7 +148,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 AuthButton(
                   buttonText: 'Reset now',
                   fct: () {
-                    _forgetPassFCT();
+                    _forgerPassFCT();
                   },
                 ),
               ],

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tkecom/consts/consts_shelf.dart';
 import 'package:tkecom/inner_screens/cat_screen.dart';
 import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
+import 'package:tkecom/provider/auth_provider.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/dark_theme_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
@@ -13,11 +14,11 @@ import 'package:tkecom/screens/screens_shelf.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   await Firebase.initializeApp(
-   options: DefaultFirebaseOptions.currentPlatform,
- );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -47,6 +48,9 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) {
+          return AuthProvider();
+        }),
+        ChangeNotifierProvider(create: (_) {
           return themeChangeProvider;
         }),
         ChangeNotifierProvider(create: (_) {
@@ -68,7 +72,7 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             title: 'TKEcom',
             theme: Styles.themeData(themeProvider.getDarkTheme, context),
-            home: const LoginScreen(),
+            initialRoute: BottomBarScreen.routeName,
             routes: {
               OnSaleScreen.routeName: (ctx) => const OnSaleScreen(),
               BottomBarScreen.routeName: (context) => const BottomBarScreen(),

@@ -151,7 +151,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         child: TextWidget(
                           text: 'Free delivery',
                           color: Colors.white,
-                          textSize: 20,
+                          textSize: 15,
                           isTitle: true,
                         ),
                       ),
@@ -282,7 +282,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           child: InkWell(
                             onTap: isInCart
                                 ? null
-                                : () {
+                                : () async {
                                     final User? user = authInstance.currentUser;
                                     if (user == null) {
                                       GlobalMethods.warningDialog(
@@ -295,11 +295,13 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           context: context);
                                       return;
                                     }
-                                    cartProvider.addProductsToCart(
+                                    await GlobalMethods.addToCart(
                                       productId: productDetails.id,
                                       quantity: int.parse(
                                           _quantityTextController.text),
+                                      context: context,
                                     );
+                                    await cartProvider.fetchCart();
                                   },
                             borderRadius: BorderRadius.circular(10),
                             child: Padding(
@@ -317,7 +319,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               ],
             ),
           ),
-        )
+        ),
       ]),
     );
   }

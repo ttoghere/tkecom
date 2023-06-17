@@ -121,11 +121,12 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                         return "Please Enter Your Email";
                       }
                       showDialog(
-                          context: context,
-                          builder: (context) => const AlertDialog(
-                                content: Text(
-                                    "Your Password Reset Link,\nHas been sent to your email!"),
-                              ));
+                        context: context,
+                        builder: (context) => const AlertDialog(
+                          content: Text(
+                              "Your Password Reset Link,\nHas been sent to your email!"),
+                        ),
+                      );
                     },
                     decoration: const InputDecoration(
                       hintText: 'Email address',

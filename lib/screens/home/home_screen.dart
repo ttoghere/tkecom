@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // final themeState = utils.getTheme;
     final Color color = Utils(context).color;
     Size size = utils.getScreenSize;
-    ProductsProvider productProviders =Provider.of<ProductsProvider>(context);
+    ProductsProvider productProviders = Provider.of<ProductsProvider>(context);
     List<ProductModel> allProducts = productProviders.getProducts;
 
     return Scaffold(
@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 allProducts.length,
                 (index) => ChangeNotifierProvider.value(
                   value: allProducts[index],
-                  child: FeedsWidget(),
+                  child: const FeedsWidget(),
                 ),
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:tkecom/provider/cart_provider.dart';
+import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 import 'cart_shelf.dart';
@@ -38,8 +39,9 @@ class CartScreen extends StatelessWidget {
                       GlobalMethods.warningDialog(
                           title: 'Empty your cart?',
                           subtitle: 'Are you sure?',
-                          fct: () {
-                            cartProvider.clearCart();
+                          fct: () async {
+                            await cartProvider.clearOnlineCart();
+                            cartProvider.clearLocalCart();
                             Navigator.of(context).pop();
                           },
                           context: context);
@@ -73,6 +75,18 @@ class CartScreen extends StatelessWidget {
   Widget _checkout({required BuildContext ctx}) {
     final Color color = Utils(ctx).color;
     Size size = Utils(ctx).getScreenSize;
+    final cartProvider = Provider.of<CartProvider>(ctx);
+    final productProvier = Provider.of<ProductsProvider>(ctx);
+
+    double total = 0.0;
+    cartProvider.getCartItems.forEach((key, value) {
+      final getCurrentProduct =
+          productProvier.findProdById(productId: value.productId);
+      total += (getCurrentProduct.isOnSale
+              ? getCurrentProduct.salePrice
+              : getCurrentProduct.price) *
+          value.quantity;
+    });
     return SizedBox(
       width: double.infinity,
       height: size.height * 0.1,
@@ -99,7 +113,7 @@ class CartScreen extends StatelessWidget {
           const Spacer(),
           FittedBox(
             child: TextWidget(
-              text: 'Total: \$0.259',
+              text: 'Total: \$${total.toStringAsFixed(2)}',
               color: color,
               textSize: 18,
               isTitle: true,

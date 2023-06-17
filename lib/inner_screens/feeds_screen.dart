@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
@@ -17,6 +18,16 @@ class FeedsScreen extends StatefulWidget {
 class _FeedsScreenState extends State<FeedsScreen> {
   final TextEditingController? _searchTextController = TextEditingController();
   final FocusNode _searchTextFocusNode = FocusNode();
+  List<ProductModel> listProductSearch = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final productsProvider =
+        Provider.of<ProductsProvider>(context, listen: false);
+    productsProvider.fetchProducts();
+  }
+
   @override
   void dispose() {
     _searchTextController!.dispose();
@@ -53,7 +64,9 @@ class _FeedsScreenState extends State<FeedsScreen> {
                 focusNode: _searchTextFocusNode,
                 controller: _searchTextController,
                 onChanged: (valuee) {
-                  setState(() {});
+                  setState(() {
+                    listProductSearch = productProviders.searchQuery(valuee);
+                  });
                 },
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
@@ -82,19 +95,30 @@ class _FeedsScreenState extends State<FeedsScreen> {
               ),
             ),
           ),
-          GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              padding: EdgeInsets.zero,
-              // crossAxisSpacing: 10,
-              childAspectRatio: size.width / (size.height * 0.59),
-              children: List.generate(
-                  allProducts.length,
-                  (index) => ChangeNotifierProvider.value(
-                        value: allProducts[index],
-                        child: FeedsWidget(),
-                      ))),
+          _searchTextController!.text.isNotEmpty && listProductSearch.isEmpty
+              ? EmptyProductsListWidget(
+                  color: color,
+                  text: "No Products fount, please try another keyword",
+                )
+              : GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  padding: EdgeInsets.zero,
+                  // crossAxisSpacing: 10,
+                  childAspectRatio: size.width / (size.height * 0.59),
+                  children: List.generate(
+                    _searchTextController!.text.isNotEmpty
+                        ? listProductSearch.length
+                        : allProducts.length,
+                    (index) => ChangeNotifierProvider.value(
+                      value: _searchTextController!.text.isNotEmpty
+                          ? listProductSearch[index]
+                          : allProducts[index],
+                      child: const FeedsWidget(),
+                    ),
+                  ),
+                )
         ]),
       ),
     );

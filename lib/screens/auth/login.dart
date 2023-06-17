@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:tkecom/screens/auth/forget_pass.dart';
 import 'package:tkecom/screens/auth/register.dart';
 import 'package:tkecom/screens/btm_bar.dart';
+import 'package:tkecom/screens/fetch_screen.dart';
 import 'package:tkecom/screens/home/home_shelf.dart';
 import 'package:tkecom/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -57,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
               password: _passTextController.text.trim(),
             )
             .whenComplete(() => Navigator.of(context)
-                .pushReplacementNamed(BottomBarScreen.routeName));
+                .pushReplacementNamed(FetchScreen.routeName));
       } on auth.FirebaseAuthException catch (e) {
         setState(() {
           _isLoading = false;
@@ -269,8 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   AuthButton(
                     fct: () {
-                      Navigator.of(context)
-                          .pushNamed(BottomBarScreen.routeName);
+                      Navigator.of(context).pushNamed(FetchScreen.routeName);
                     },
                     buttonText: 'Continue as a guest',
                     primary: Colors.black,

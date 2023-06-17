@@ -10,6 +10,7 @@ import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/provider/recently_viewed_provider.dart';
 import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
+import 'package:tkecom/screens/fetch_screen.dart';
 import 'package:tkecom/screens/screens_shelf.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -72,8 +73,9 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             title: 'TKEcom',
             theme: Styles.themeData(themeProvider.getDarkTheme, context),
-            initialRoute: BottomBarScreen.routeName,
+            initialRoute: LoginScreen.routeName,
             routes: {
+              FetchScreen.routeName: (context) => const FetchScreen(),
               OnSaleScreen.routeName: (ctx) => const OnSaleScreen(),
               BottomBarScreen.routeName: (context) => const BottomBarScreen(),
               FeedsScreen.routeName: (ctx) => const FeedsScreen(),

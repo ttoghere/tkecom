@@ -14,6 +14,7 @@ import '../../services/global_methods.dart';
 import '../../services/utils.dart';
 import '../../widgets/auth_button.dart';
 import '../../widgets/text_widget.dart';
+import '../fetch_screen.dart';
 import 'forget_pass.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -78,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             "createdAt": Timestamp.now(),
           });
         }).whenComplete(() => Navigator.of(context)
-                .pushReplacementNamed(BottomBarScreen.routeName));
+                .pushReplacementNamed(FetchScreen.routeName));
       } on auth.FirebaseAuthException catch (e) {
         setState(() {
           _isLoading = false;

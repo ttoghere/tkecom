@@ -171,8 +171,12 @@ class _CartWidgetState extends State<CartWidget> {
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              cartProvider.removeOneItem(cartModel.productId);
+                            onTap: () async {
+                              await cartProvider.removeOneItem(
+                                productId: cartModel.productId,
+                                cartId: cartModel.id,
+                                quantity: cartModel.quantity,
+                              );
                             },
                             child: const Icon(
                               Icons.shopping_cart,
@@ -188,7 +192,8 @@ class _CartWidgetState extends State<CartWidget> {
                             isInWishlist: _isInWishlist,
                           ),
                           TextWidget(
-                            text: '\$${userPrice.toStringAsFixed(2)}',
+                            text:
+                                '\$${(userPrice * int.parse(_quantityTextController.text)).toStringAsFixed(2)}',
                             color: color,
                             textSize: 18,
                             maxLines: 1,

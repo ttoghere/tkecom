@@ -8,6 +8,7 @@ import 'package:tkecom/inner_screens/inner_screens_shelf.dart';
 import 'package:tkecom/models/products_model.dart';
 import 'package:tkecom/provider/cart_provider.dart';
 import 'package:tkecom/provider/wishlist_provider.dart';
+import 'package:tkecom/screens/auth/auth_shelf.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
 
@@ -44,8 +45,6 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
           onTap: () {
             Navigator.of(context).pushNamed(ProductDetails.routeName,
                 arguments: productModel.id);
-            // GlobalMethods.navigateTo(
-            //     ctx: context, routeName: ProductDetails.routeName);
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -58,8 +57,8 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                     children: [
                       FancyShimmerImage(
                         imageUrl: productModel.imageUrl,
-                        height: size.width * 0.22,
-                        width: size.width * 0.22,
+                        height: size.width * 0.18,
+                        width: size.width * 0.18,
                         boxFit: BoxFit.fill,
                       ),
                       const SizedBox(
@@ -70,7 +69,7 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                           TextWidget(
                             text: '1 ${productModel.isPiece ? "Piece" : "KG"}',
                             color: color,
-                            textSize: 22,
+                            textSize: 18,
                             isTitle: true,
                           ),
                           const SizedBox(
@@ -79,7 +78,7 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                           Row(
                             children: [
                               GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   final User? user = authInstance.currentUser;
                                   if (user == null) {
                                     GlobalMethods.warningDialog(
@@ -87,15 +86,19 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                                         subtitle:
                                             "Please login to your account",
                                         fct: () {
-                                          Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  LoginScreen.routeName);
                                         },
                                         context: context);
                                     return;
                                   }
-                                  cartProvider.addProductsToCart(
+                                  await GlobalMethods.addToCart(
                                     productId: productModel.id,
                                     quantity: 1,
+                                    context: context,
                                   );
+                                  await cartProvider.fetchCart();
                                 },
                                 child: Icon(
                                   isInCart ? IconlyBold.bag2 : IconlyLight.bag2,
@@ -112,6 +115,9 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                         ],
                       )
                     ],
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   PriceWidget(
                     salePrice: productModel.salePrice,

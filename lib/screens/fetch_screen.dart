@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tkecom/consts/contss.dart';
 import 'package:tkecom/consts/firebase_contants.dart';
 import 'package:tkecom/provider/cart_provider.dart';
+import 'package:tkecom/provider/order_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/provider/wishlist_provider.dart';
 import 'package:tkecom/screens/btm_bar.dart';
@@ -28,6 +29,7 @@ class _FetchScreenState extends State<FetchScreen> {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
       final wishListProvider =
           Provider.of<WishlistProvider>(context, listen: false);
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
       final User? user = authInstance.currentUser;
       if (user == null) {
         await productsProvider.fetchProducts();
@@ -37,6 +39,7 @@ class _FetchScreenState extends State<FetchScreen> {
         await productsProvider.fetchProducts();
         await cartProvider.fetchCart();
         await wishListProvider.fetchWishlist();
+        await orderProvider.fetchOrders();
       }
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(

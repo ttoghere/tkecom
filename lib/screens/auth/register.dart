@@ -55,10 +55,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return null;
     }
     FocusScope.of(context).unfocus();
-    setState(() {
-      _isLoading = true;
-    });
+
     if (isValid) {
+      setState(() {
+        _isLoading = true;
+      });
       _formKey.currentState!.save();
       try {
         await auth.FirebaseAuth.instance
@@ -69,6 +70,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             .whenComplete(() async {
           final User? user = authInstance.currentUser;
           final uid = user!.uid;
+          user.updateDisplayName(_fullNameController.text);
+          user.reload();
           FirebaseFirestore.instance.collection("users").doc(uid).set({
             "id": uid,
             "name": _fullNameController.text,

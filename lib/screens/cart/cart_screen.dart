@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:tkecom/consts/firebase_contants.dart';
 import 'package:tkecom/provider/cart_provider.dart';
+import 'package:tkecom/provider/order_provider.dart';
 import 'package:tkecom/provider/products_provider.dart';
 import 'package:tkecom/services/services_shelf.dart';
 import 'package:tkecom/widgets/widgets_shelf.dart';
+import 'package:uuid/uuid.dart';
 import 'cart_shelf.dart';
 
 class CartScreen extends StatelessWidget {
@@ -77,7 +83,7 @@ class CartScreen extends StatelessWidget {
     Size size = Utils(ctx).getScreenSize;
     final cartProvider = Provider.of<CartProvider>(ctx);
     final productProvier = Provider.of<ProductsProvider>(ctx);
-
+    final ordersProvider = Provider.of<OrderProvider>(ctx, listen: false);
     double total = 0.0;
     cartProvider.getCartItems.forEach((key, value) {
       final getCurrentProduct =
@@ -90,7 +96,6 @@ class CartScreen extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: size.height * 0.1,
-      // color: ,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(children: [
@@ -99,7 +104,54 @@ class CartScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: InkWell(
               borderRadius: BorderRadius.circular(10),
-              onTap: () {},
+              onTap: () async {
+                final orderId = const Uuid().v4();
+                User? user = authInstance.currentUser;
+                final productProvider =
+                    Provider.of<ProductsProvider>(ctx, listen: false);
+
+                cartProvider.getCartItems.forEach((key, value) async {
+                  final getCurrentProduct =
+                      productProvider.findProdById(productId: value.productId);
+
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection("orders")
+                        .doc(orderId)
+                        .set({
+                      "orderId": orderId,
+                      "userId": user!.uid,
+                      "productId": value.productId,
+                      "price": (getCurrentProduct.isOnSale
+                              ? getCurrentProduct.salePrice
+                              : getCurrentProduct.price) *
+                          value.quantity,
+                      "totalPrice": total,
+                      "quantity": value.quantity,
+                      "imageUrl": getCurrentProduct.imageUrl,
+                      "userName": user.displayName,
+                      "orderDate": Timestamp.now()
+                    });
+                    await cartProvider.clearOnlineCart();
+                    cartProvider.clearLocalCart();
+                    //TODO fetch the orders here
+                    ordersProvider.fetchOrders();
+                    await Fluttertoast.showToast(
+                      msg: "Your Order Has Been Sent",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                    );
+                  } catch (error) {
+                    GlobalMethods.warningDialog(
+                        title: "An error occured",
+                        subtitle: "Error: $error",
+                        fct: () {
+                          Navigator.of(ctx).pop();
+                        },
+                        context: ctx);
+                  } finally {}
+                });
+              },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextWidget(
